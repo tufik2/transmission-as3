@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<project default="main" basedir=".">
+	
+	<!-- The following lines should be edited for this project -->
+	<property name="project.name" value="TransmissionDemo" />
+	<property name="main.class" value="transmission.demo.TransmissionDemoController" />
+
+	<!-- The rest of build.xml can be left unchanged -->
+	<property name="jar.module" value="${project.name}.jar"/>
+	
+	<path id="main.classpath">
+		<pathelement location="dist/${jar.module}"/>
+	</path>
+	
+	<available property="lib.exists" file="lib" type="dir"/>
+	
+	<target name="clean">
+		<delete dir="build"/>
+		<delete dir="dist"/>
+	</target>
+	
+	<target name="flatten.classpath" depends="clean" if="lib.exists">
+		<!-- Grab a reference to all the jars out of the lib directory -->
+		<path id="main.library">
+			<fileset dir="lib/">
+				<include name="*.jar"/>
+			</fileset>
+		</path>
+		
+		<!-- Get a string we can use for the classpath in our jar manifest -->
+		<pathconvert property="lib.project.manifest.classpath" pathsep=" " setonempty="no">
+			<path refid="main.library"/>
+			<flattenmapper/>
+		</pathconvert>
+	</target>
+	
+	<!-- We don't need to compile the source because Eclipse does it automatically for us 
+			before this ant task runs. -->
+	<!--target name="compile">
+		<mkdir dir="bin"/>
+		<javac destdir="bin" debug="on" optimize="on">
+			<src path="src"/>
+		</javac>
+	</target-->
+		
+	<target name="makejar-lib" depends="flatten.classpath" if="lib.exists">
+		<mkdir dir="dist"/>
+		<jar jarfile="dist/${jar.module}">
+			<fileset dir="bin">
+				<include name="**/*.class"/>
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class" value="${main.class}"/>
+				<attribute name="Class-Path" value="${lib.project.manifest.classpath}"/>
+			</manifest>
+		</jar>
+		<copy todir="dist">
+			<fileset dir="lib" includes="*.jar"/>
+		</copy>
+	</target>
+	
+	<target name="makejar-nolib" depends="clean" unless="lib.exists">
+		<echo message="No library exists" />
+		<mkdir dir="dist"/>
+		<jar jarfile="dist/${jar.module}">
+			<fileset dir="bin">
+				<include name="**/*.class"/>
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class" value="${main.class}"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="main" depends="makejar-lib,makejar-nolib" />
+	
+</project>

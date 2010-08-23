@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	
+	creationComplete="creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import transmission.Message;
+			import transmission.Transmission;
+			import transmission.demo.DemoMessageHandler;
+			import transmission.demo.DemoObject;
+			import transmission.demo.Model;
+			
+			private var transmission:Transmission = Transmission.getInstance();
+			
+			[Bindable]
+			private var model:Model = Model.getInstance();
+
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				initTransmission();
+				registerMessageHandlers();
+			}
+			
+			protected function initTransmission():void
+			{
+				var executablePath:String;
+				
+				// Make sure to change these paths if they are different on your machine.
+				if (isWindows())
+				{
+					executablePath = "C:/Program Files/Java/jre6/bin/javaw.exe";
+				}
+				else
+				{
+					executablePath = "/usr/bin/java";
+				}
+				
+				var transmissionControllerPackage:String = "transmission.demo.TransmissionDemoController";
+				var classpaths:Array = [
+					"assets/java/flex-messaging-common.jar",
+					"assets/java/flex-messaging-core.jar",
+					"assets/java/Transmission.jar",
+					"assets/java/TransmissionDemo.jar"
+				];
+				
+				Transmission.getInstance().init(executablePath, transmissionControllerPackage, 
+					classpaths);
+			}
+			
+			protected function registerMessageHandlers():void
+			{
+				Transmission.getInstance().addMessageHandler("test", new DemoMessageHandler());
+			}
+			
+			protected function isWindows():Boolean
+			{
+				return (Capabilities.os.toLowerCase().indexOf("win") > -1);
+			}
+			
+			protected function onSendMessage(event:Event):void
+			{
+				var obj:DemoObject = new DemoObject();
+				obj.id = 1;
+				obj.text = "Sending message";
+				
+				new Message("test", obj).send();
+			}
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center" />
+	</s:layout>
+	
+	<s:Button label="Send Transmission Message" click="onSendMessage(event)" />
+	<s:Label text="{model.label}" />
+	
+</s:WindowedApplication>
