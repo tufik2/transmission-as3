@@ -17,7 +17,7 @@ package transmission.demo
 		public function handleMessage(message:Message):void
 		{
 			var obj:DemoObject = message.data as DemoObject;
-			Model.getInstance().label = "ID: " + obj.id + ", Text: " + obj.text;
+			Model.getInstance().demoObject = obj;
 		}
 	}
 }

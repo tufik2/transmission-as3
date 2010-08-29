@@ -3,7 +3,9 @@
 	xmlns:s="library://ns.adobe.com/flex/spark" 
 	xmlns:mx="library://ns.adobe.com/flex/mx"
 	
-	creationComplete="creationCompleteHandler(event)">
+	creationComplete="creationCompleteHandler(event)"
+	close="closeHandler(event)">
+	
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
@@ -25,6 +27,9 @@
 				registerMessageHandlers();
 			}
 			
+			/**
+			 * Initializes Transmission.
+			 */
 			protected function initTransmission():void
 			{
 				var executablePath:String;
@@ -51,23 +56,50 @@
 					classpaths);
 			}
 			
+			/**
+			 * Registers message handlers with Transmission.  In production, this should probably
+			 * be handled in a TransmissionService class which is responsible for sending and
+			 * receiving all Transmission messages.
+			 */
 			protected function registerMessageHandlers():void
 			{
 				Transmission.getInstance().addMessageHandler("test", new DemoMessageHandler());
 			}
 			
+			/**
+			 * Detects whether the OS is Windows or not.
+			 */
 			protected function isWindows():Boolean
 			{
 				return (Capabilities.os.toLowerCase().indexOf("win") > -1);
 			}
 			
-			protected function onSendMessage(event:Event):void
+			/**
+			 * Sends a message to Java.
+			 */
+			protected function sendMessageHandler(event:Event):void
 			{
 				var obj:DemoObject = new DemoObject();
-				obj.id = 1;
+				
+				if (Model.getInstance().demoObject)
+				{
+					obj.id = Model.getInstance().demoObject.id + 1;
+				}
+				else
+				{
+					obj.id = 1;
+				}
 				obj.text = "Sending message";
 				
 				new Message("test", obj).send();
+			}
+			
+			/**
+			 * When the application exits, make sure to kill Transmission.
+			 */
+			protected function closeHandler(event:Event):void
+			{
+				Transmission.getInstance().exit(true);
 			}
 
 		]]>
@@ -81,7 +113,7 @@
 		<s:VerticalLayout horizontalAlign="center" />
 	</s:layout>
 	
-	<s:Button label="Send Transmission Message" click="onSendMessage(event)" />
+	<s:Button label="Send Transmission Message" click="sendMessageHandler(event)" />
 	<s:Label text="{model.label}" />
 	
 </s:WindowedApplication>

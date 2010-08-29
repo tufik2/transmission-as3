@@ -8,7 +8,30 @@ package transmission.demo
 	[Bindable]
 	public class Model
 	{
-		public var label:String;
+		//----------------------------------------------------------------------------//
+		// demoObject:DemoObject
+		
+		protected var _demoObject:DemoObject;
+		
+		public function get demoObject():DemoObject
+		{
+			return _demoObject;
+		}
+		
+		public function set demoObject(value:DemoObject):void
+		{
+			if (_demoObject != value)
+			{
+				_demoObject = value;
+				dispatchEvent(new Event("demoObjectPropertyChanged"));
+			}
+		}
+
+		[Bindable("demoObjectPropertyChanged")]
+		public function get label():String
+		{
+			return "ID: " + demoObject.id + ", Text: " + demoObject.text;
+		}
 		
 		//----------------------------------------------------------------------------------------//
 		// Singleton pattern
