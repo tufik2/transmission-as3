@@ -78,7 +78,7 @@ public class TransmissionStandardStream extends ByteArrayOutputStream
 			if (record.length() == 0 || record.equals(lineSeparator))
 			{
 				// Avoid empty records
-				fileOutputStream.write(record.getBytes());
+				writeToFile(record.getBytes());
 				
 				super.reset();
 				return;
@@ -96,10 +96,24 @@ public class TransmissionStandardStream extends ByteArrayOutputStream
 			// If a file output stream is available, write the bytes to it. Otherwise don't.
 			if (fileOutputStream != null)
 			{
-				fileOutputStream.write(record.getBytes());
+				writeToFile(record.getBytes());
 			}
 			
 			super.reset();
+		}
+	}
+	
+	/**
+	 * Writes bytes to a file if the .transmissionLog.log files exists.
+	 * 
+	 * @param bytes the bytes to write to the file.
+	 * @throws IOException
+	 */
+	public void writeToFile(byte[] bytes) throws IOException
+	{
+		if (fileOutputStream != null)
+		{
+			fileOutputStream.write(bytes);
 		}
 	}
 }
