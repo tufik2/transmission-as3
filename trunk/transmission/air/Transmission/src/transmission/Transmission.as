@@ -75,11 +75,11 @@ package transmission
 		 * @param classpaths An array of String paths for all java jar dependencies
 		 */
 		public function init(executablePath:String, transmissionControllerPackage:String = "", 
-				classpaths:Array = null):void
+				classpaths:Array = null, debug:Boolean = true):void
 		{
 			if (!initialized)
 			{
-				startupJavaProcess(executablePath, transmissionControllerPackage, classpaths);
+				startupJavaProcess(executablePath, transmissionControllerPackage, classpaths, debug);
 				initialized = true;
 			}
 		}
@@ -153,13 +153,19 @@ package transmission
 		 * Starts up the java process
 		 */
 		protected function startupJavaProcess(executablePath:String, 
-				transmissionControllerPackage:String, classpaths:Array):void
+				transmissionControllerPackage:String, classpaths:Array, debug:Boolean):void
 		{
 			var info:NativeProcessStartupInfo = new NativeProcessStartupInfo();
 			info.workingDirectory = File.applicationDirectory;
 			info.executable = File.applicationDirectory.resolvePath(executablePath);
 			
 			var args:Vector.<String> = new Vector.<String>();
+			
+			if (debug)
+			{
+				args.push("-Xdebug");
+				args.push("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
+			}
 			
 			// Add the classpath argument
 			if (classpaths && classpaths.length)
