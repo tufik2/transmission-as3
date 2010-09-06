@@ -73,6 +73,7 @@ package transmission
 		 * @param executablePath The path to the Java executable (or Java Application Bundle on Mac)
 		 * @param transmissionControllerPackage The java classpath to the transmission controller
 		 * @param classpaths An array of String paths for all java jar dependencies
+		 * @param if true, remote debugging is enabled. False otherwise.
 		 */
 		public function init(executablePath:String, transmissionControllerPackage:String = "", 
 				classpaths:Array = null, debug:Boolean = true):void
