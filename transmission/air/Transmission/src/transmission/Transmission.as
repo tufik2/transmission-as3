@@ -162,7 +162,11 @@ package transmission
 			
 			var args:Vector.<String> = new Vector.<String>();
 			
-			if (debug)
+			// Debug must be turned on and there must be a transmissionControllerPackage specified.
+			// If the executable is a java-wrapper that already contains the arguments and classpath
+			// information like Jar Bundler on Mac OSX does, don't add this argument because it will
+			// break.
+			if (debug && transmissionControllerPackage)
 			{
 				args.push("-Xdebug");
 				args.push("-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n");
