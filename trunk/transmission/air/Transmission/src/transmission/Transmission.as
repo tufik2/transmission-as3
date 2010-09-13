@@ -72,7 +72,8 @@ package transmission
 		 * 
 		 * @param executablePath The path to the Java executable (or Java Application Bundle on Mac)
 		 * @param transmissionControllerPackage The java classpath to the transmission controller
-		 * @param classpaths An array of String paths for all java jar dependencies
+		 * @param classpaths An array of String paths for all java jar dependencies (can be 
+		 * individual jars or directories that contain jars).
 		 * @param if true, remote debugging is enabled. False otherwise.
 		 */
 		public function init(executablePath:String, transmissionControllerPackage:String = "", 
@@ -175,8 +176,32 @@ package transmission
 			// Add the classpath argument
 			if (classpaths && classpaths.length)
 			{
+				var jarPaths:Array = new Array();
+				
+				// Look for directories that may contain jars
+				for (var i:int = 0; i < classpaths.length; i++)
+				{
+					var file:File = File.applicationDirectory.resolvePath(classpaths[i]);
+					
+					if (file.isDirectory)
+					{
+						var childFiles:Array = file.getDirectoryListing();
+						for each (var childFile:File in childFiles)
+						{
+							if (!childFile.isDirectory && childFile.extension.toLowerCase() == "jar")
+							{
+								jarPaths.push(childFile.getRelativePath(info.workingDirectory));
+							}
+						}
+					}
+					else
+					{
+						jarPaths.push(file.getRelativePath(info.workingDirectory));
+					}
+				}
+				
 				args.push("-cp");
-				args.push(classpaths.join(classpathSeparator));
+				args.push(jarPaths.join(classpathSeparator));
 			}
 			
 			// Add the transmissionControllerPackage argument.
