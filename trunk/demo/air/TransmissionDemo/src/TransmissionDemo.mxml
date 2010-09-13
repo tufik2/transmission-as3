@@ -45,12 +45,10 @@
 				}
 				
 				var transmissionControllerPackage:String = "transmission.demo.TransmissionDemoController";
-				var classpaths:Array = [
-					"assets/java/flex-messaging-common.jar",
-					"assets/java/flex-messaging-core.jar",
-					"assets/java/Transmission.jar",
-					"assets/java/TransmissionDemo.jar"
-				];
+				
+				// The classpaths array can consist of paths to jars themselves, or directories that
+				// contain jars.  In this case, the assets/java directory contains all of my jars.
+				var classpaths:Array = ["assets/java"];
 				
 				Transmission.getInstance().init(executablePath, transmissionControllerPackage, 
 					classpaths);
