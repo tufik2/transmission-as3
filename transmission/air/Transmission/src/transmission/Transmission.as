@@ -190,7 +190,7 @@ package transmission
 						{
 							if (!childFile.isDirectory && childFile.extension.toLowerCase() == "jar")
 							{
-								jarPaths.push(childFile.getRelativePath(info.workingDirectory));
+								jarPaths.push(childFile.nativePath);
 							}
 						}
 					}
