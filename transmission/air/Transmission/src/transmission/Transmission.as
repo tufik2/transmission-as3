@@ -196,7 +196,7 @@ package transmission
 					}
 					else
 					{
-						jarPaths.push(file.getRelativePath(info.workingDirectory));
+						jarPaths.push(file.nativePath);
 					}
 				}
 				
