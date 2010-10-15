@@ -20,6 +20,9 @@
 
 package transmission
 {
+	import flash.utils.IDataInput;
+	import flash.utils.IDataOutput;
+	import flash.utils.IExternalizable;
 	
 	[Bindable]
 	[RemoteClass(alias="transmission.Message")]
@@ -27,8 +30,12 @@ package transmission
 	/**
 	 * A message object that is passed between AIR 2.0 and Java. Each instance of this object serves
 	 * as a communication between the two platforms.
+	 * 
+	 * I made this class implement IExternalizable because occasionally nested objects are 
+	 * serialized incorrectly without explicitly stating the serialization order in this class. I
+	 * believe this is a bug in AMF.
 	 */
-	public class Message
+	public class Message implements IExternalizable
 	{
 		/**
 		 * The type of message. This property is used to forward the message to its appropriate
@@ -54,6 +61,24 @@ package transmission
 		public function send():void
 		{
 			Transmission.getInstance().sendMessage(this);
+		}
+		
+		/**
+		 * Make sure the properties are serialized in the correct order.
+		 */
+		public function readExternal(input:IDataInput):void
+		{
+			type = input.readObject() as String;
+			data = input.readObject();
+		}
+		
+		/**
+		 * Make sure the properties are deserialized in the correct order.
+		 */
+		public function writeExternal(output:IDataOutput):void
+		{
+			output.writeObject(type);
+			output.writeObject(data);
 		}
 	}
 }
