@@ -20,11 +20,20 @@
 
 package transmission;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * A message object that is passed between AIR 2.0 and Java. Each instance of this object serves
  * as a communication between the two platforms.
+ * 
+ * I made this class implement Externalizable because occasionally nested objects are serialized
+ * incorrectly without explicitly stating the serialization order in this class. I believe this is
+ * a bug in AMF.
  */
-public class Message
+public class Message implements Externalizable
 {
 	private String type;
 	private Object data;
@@ -76,5 +85,25 @@ public class Message
 	public void setData(Object data)
 	{
 		this.data = data;
+	}
+	
+	/**
+	 * Make sure the properties are serialized in the correct order.
+	 */
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException 
+	{
+		// TODO Auto-generated method stub
+		setType((String) in.readObject());
+		setData(in.readObject());
+	}
+	
+	/**
+	 * Make sure the properties are deserialized in the correct order.
+	 */
+	public void writeExternal(ObjectOutput out) throws IOException 
+	{
+		// TODO Auto-generated method stub
+		out.writeObject(getType());
+		out.writeObject(getData());
 	}
 }
