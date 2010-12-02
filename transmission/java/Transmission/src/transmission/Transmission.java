@@ -50,9 +50,6 @@ public class Transmission
 	PrintStream realSystemOut;
 	PrintStream realSystemErr;
 	
-	PrintStream debugSystemOut;
-	PrintStream debugSystemErr;
-	
 	public Transmission()
 	{
 		initializePrintStreams();
@@ -95,14 +92,12 @@ public class Transmission
 		}
 		
 		// Create a standard output and error stream that we'll use to send all non-transmission 
-		// messages to the debug file ".transmissionLog.log" so they don't go to AIR 2.0.
+		// messages to the debug file ".transmissionLog.log" so they don't go to AIR.
 		TransmissionStandardStream out = new TransmissionStandardStream(StandardStreamType.STANDARD_OUTPUT, fos);
 		TransmissionStandardStream err = new TransmissionStandardStream(StandardStreamType.STANDARD_ERROR, fos);
-		debugSystemOut = new PrintStream(out, true);
-		debugSystemErr = new PrintStream(err, true);
 		
-		System.setOut(debugSystemOut);
-		System.setErr(debugSystemErr);
+		System.setOut(new PrintStream(out, true));
+		System.setErr(new PrintStream(err, true));
 	}
 
 	/**
@@ -126,9 +121,6 @@ public class Transmission
 	{
 		try
 		{
-			// Switch to actual system.out for sending transmission messages.
-			System.setOut(realSystemOut);
-			
 			_byteArrayOutputStream.reset();
 			
 			_amf3Output.reset();
@@ -136,13 +128,11 @@ public class Transmission
 			_amf3Output.writeObject(message);
 			
 			byte[] byteArray = _byteArrayOutputStream.toByteArray();
-			writeMessageToStream(System.out, byteArray);
-			
-			// Switch back to our debugging system.out which writes all output to a file.
-			System.setOut(debugSystemOut);
+			writeMessageToStream(realSystemOut, byteArray);
 		}
 		catch (IOException e)
 		{
+			System.out.println("Error sending messing from transmission.");
 			new TransmissionError("Error sending message", e).send();
 		}
 	}
@@ -156,9 +146,6 @@ public class Transmission
 	{
 		try
 		{
-			// Switch to actual system.err for sending transmission messages.
-			System.setErr(realSystemErr);
-			
 			_byteArrayOutputStream.reset();
 			
 			_amf3Output.reset();
@@ -166,10 +153,7 @@ public class Transmission
 			_amf3Output.writeObject(te);
 			
 			byte[] byteArray = _byteArrayOutputStream.toByteArray();
-			writeMessageToStream(System.err, byteArray);
-			
-			// Switch back to our debugging system.err which writes all output to a file.
-			System.setErr(debugSystemErr);
+			writeMessageToStream(realSystemErr, byteArray);
 		}
 		catch (IOException e)
 		{
